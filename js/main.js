@@ -97,9 +97,11 @@ function cellClicked(elCell, i, j) {
         }
         else if (!currCell.isMine) checkGameOver()
 
+        // Update the current cell value
         elCell.innerText = currCell.isMine ? BOMB :
             currCell.minesAroundCount === 0 ? '' : currCell.minesAroundCount
 
+        // Check if cell is empty
         if (elCell.innerText === '') {
             expandShown(gBoard, i, j)
         } else {
