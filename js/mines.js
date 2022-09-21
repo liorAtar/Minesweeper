@@ -17,21 +17,16 @@ function randomLocateMine(firstI, firstJ) {
             (i === firstI + 1 && j === firstJ) ||
             (i === firstI + 1 && j === firstJ + 1)
         ) {
-            console.log('entered', index, 'i', i, 'j', j)
-
             i = getRandomIntInclusive(0, gLevel.SIZE - 1)
             j = getRandomIntInclusive(0, gLevel.SIZE - 1)
         }
-
-        console.log('index', index, 'i', i, 'j', j)
-
         gBoard[i][j].isMine = true
     }
 }
 
 function setMinesNegsCount(board) {
     var bombCount = 0
-
+    
     for (var i = 0; i < gLevel.SIZE; i++) {
         for (var j = 0; j < gLevel.SIZE; j++) {
             bombCount = getCellMinesAround(board, i, j)
@@ -44,6 +39,7 @@ function setMinesNegsCount(board) {
 
 function getCellMinesAround(board, rowIdx, colIdx) {
     var bombCount = 0
+
     for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
         if (i < 0 || i >= board.length) continue
         for (var j = colIdx - 1; j <= colIdx + 1; j++) {
@@ -55,7 +51,6 @@ function getCellMinesAround(board, rowIdx, colIdx) {
             }
         }
     }
-
     return bombCount
 }
 
@@ -77,6 +72,7 @@ function revealeAllMines(board) {
 
 function addFlag(elCell, event, i, j) {
     const cell = gBoard[i][j]
+    
     if (event.which === 3 && !cell.isShown) {
         if (!isFirstClick) {
             firstCellClick(i, j)
