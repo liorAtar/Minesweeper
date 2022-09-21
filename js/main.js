@@ -1,23 +1,62 @@
 
-var gBoard = []
-var isFirstClick = false
+var gBoard
+var gGame
+var isFirstClick
+var timerInterval
 
 const gLevel = {
     SIZE: 8,
     MINES: 14
 };
 
-var gGame = {
-    isOn: false,
-    shownCount: 0,
-    markedCount: 0,
-    secsPassed: 0
-}
-
 function initGame() {
+    initialVariables()
+    updateBombLeft()
+    updateLives()
     buildBoard()
     renderBoard(gBoard, '.board-container')
     console.log(gBoard)
+}
+
+function restart(){
+    initGame()
+    clearInterval(timerInterval)
+    document.querySelector('.restart').innerHTML = '🙂'
+    document.querySelector('.timer').innerText = 'Timer: 000'
+    console.log(gBoard)
+}
+
+function initialVariables(){
+    isFirstClick = false
+    gBoard = []
+    gGame = {
+        isOn: false,
+        shownCount: 0,
+        markedCount: 0,
+        secsPassed: 0,
+        lives: 3
+    }
+}
+
+function updateTimer(){
+    if(gGame.secsPassed < 1000) {
+        var text = 'Timer: '
+        gGame.secsPassed++
+    
+        if(gGame.secsPassed < 10) text += `00${gGame.secsPassed}`
+        else if(gGame.secsPassed < 100 && gGame.secsPassed >= 10) text += `0${gGame.secsPassed}`
+        else if(gGame.secsPassed >= 100) text += gGame.secsPassed
+    
+        document.querySelector('.timer').innerText = text
+    }
+}
+
+function updateLives() {
+    var lives = ''
+    for (var i = 0; i < gGame.lives; i++) {
+        lives += '❤️'
+    }
+    document.querySelector('.lives').innerText = `Lives: ${lives}`
 }
 
 function buildBoard() {
@@ -34,84 +73,41 @@ function buildBoard() {
     }
 }
 
-function getCellMinesAround(board, rowIdx, colIdx) {
-    var bombCount = 0
-    for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
-        if (i < 0 || i >= board.length) continue
-        for (var j = colIdx - 1; j <= colIdx + 1; j++) {
-            if (i === rowIdx && j === colIdx) continue
-            if (j < 0 || j >= board[0].length) continue
-            var currCell = board[i][j]
-            if (currCell.isMine) {
-                bombCount++
-            }
-        }
-    }
-
-    return bombCount
+function firstCellClick(i, j) {
+    gGame.isOn = true
+    isFirstClick = true
+    timerInterval = setInterval(updateTimer, 1000)
+    randomLocateMine(i, j)
+    setMinesNegsCount(gBoard)
+    expandShown(gBoard, i, j)
+    renderBoard(gBoard, '.board-container')
+    console.log(gBoard)
 }
 
 function cellClicked(elCell, i, j) {
+    const currCell = gBoard[i][j]
     if (!isFirstClick) {
-        gGame.isOn = true
-        isFirstClick = true
-        console.log('i', i, 'j', j)
-        randomLocateMine(i, j)
-        setMinesNegsCount(gBoard)
-        expandShown(gBoard, i, j)
-        renderBoard(gBoard, '.board-container')
-        console.log(gBoard)
+        firstCellClick(i, j)
     }
-    else if (isFirstClick && gGame.isOn && !gBoard[i][j].isShown) {
-        if (gBoard[i][j].isMine) {
-            gGame.isOn = false
-            revealeAllMines(gBoard)
-            console.log('game over!')
+    else if (isFirstClick && gGame.isOn && !currCell.isShown && !currCell.isMarked) {
+        if (currCell.isMine) {
+            gGame.lives--
+            updateLives()
+            if (gGame.lives === 0) endGame()
         }
-        else if (gBoard[i][j].isMarked) {
-            gBoard[i][j].isMarked = !gBoard[i][j].isMarked
-            gGame.markedCount--
-            gGame.shownCount++
-            console.log('2 gGame.shownCount', gGame.shownCount)
-        }
-        else if (!gBoard[i][j].isMine && !gBoard[i][j].isShown) {
-            gGame.shownCount++
-            console.log('3 gGame.shownCount', gGame.shownCount)
-            checkGameOver()
-        }
+        else if (!currCell.isMine) checkGameOver()
 
-        elCell.innerText = gBoard[i][j].isMine ? BOMB :
-            gBoard[i][j].minesAroundCount === 0 ? '' : gBoard[i][j].minesAroundCount
+        elCell.innerText = currCell.isMine ? BOMB :
+            currCell.minesAroundCount === 0 ? '' : currCell.minesAroundCount
 
         if (elCell.innerText === '') {
             expandShown(gBoard, i, j)
         } else {
-            gBoard[i][j].isShown = true
+            gGame.shownCount++
+            currCell.isShown = true
         }
 
         renderBoard(gBoard, '.board-container')
-    }
-}
-
-function addFlag(elCell, event, i, j) {
-    const cell = gBoard[i][j]
-
-    if (event.which === 3 && !cell.isShown) {
-        cell.isMarked = !cell.isMarked
-        elCell.innerText = cell.isMarked ? FLAG : ''
-        if (cell.isMarked) { gGame.markedCount++ }
-        else {
-            gGame.markedCount--
-        }
-        checkGameOver()
-    }
-}
-
-function checkGameOver() {
-    if (gGame.markedCount === gLevel.MINES &&
-        gGame.shownCount === (gLevel.SIZE ** 2 - gLevel.MINES)) {
-        console.log('victorious!')
-        gGame.isOn = false
     }
 }
 
@@ -121,19 +117,34 @@ function expandShown(board, rowIdx, colIdx) {
         for (var j = colIdx - 1; j <= colIdx + 1; j++) {
             if (j < 0 || j >= board[0].length) continue
             var currCell = board[i][j]
-
-            if (i === rowIdx && j === colIdx) {
-               continue
-            }
-            if (!currCell.isShown && !currCell.isMine) {
+            if (currCell.isMarked) continue
+            if (!currCell.isShown && !currCell.isMine && !currCell.isMarked) {
                 currCell.isShown = true
                 gGame.shownCount++
-                console.log('i', i, 'j', j)
-                console.log('4 gGame.shownCount', gGame.shownCount)
                 if (currCell.minesAroundCount === 0) {
                     expandShown(board, i, j)
                 }
             }
         }
     }
+}
+
+function checkGameOver() {
+    if (gGame.markedCount === gLevel.MINES &&
+        gGame.shownCount === (gLevel.SIZE ** 2 - gLevel.MINES)) {
+        document.querySelector('.msg').innerText = 'Victory'
+        document.querySelector('.restart').innerHTML = '😍'
+        gGame.isOn = false
+        clearInterval(timerInterval)
+    }
+}
+
+function endGame(){
+    gGame.isOn = false
+    document.querySelector('.msg').innerText = 'GAME OVER'
+    document.querySelector('.restart').innerHTML = '🤯'
+    revealeAllMines(gBoard)
+    clearInterval(timerInterval)
+    renderBoard(gBoard, '.board-container')
+    return
 }

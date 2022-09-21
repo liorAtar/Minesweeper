@@ -25,12 +25,7 @@ function randomLocateMine(firstI, firstJ) {
 
         console.log('index', index, 'i', i, 'j', j)
 
-        gBoard[i][j] = {
-            minesAroundCount: 0,
-            isShown: false,
-            isMine: true,
-            isMarked: false
-        }
+        gBoard[i][j].isMine = true
     }
 }
 
@@ -47,6 +42,28 @@ function setMinesNegsCount(board) {
     }
 }
 
+function getCellMinesAround(board, rowIdx, colIdx) {
+    var bombCount = 0
+    for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
+        if (i < 0 || i >= board.length) continue
+        for (var j = colIdx - 1; j <= colIdx + 1; j++) {
+            if (i === rowIdx && j === colIdx) continue
+            if (j < 0 || j >= board[0].length) continue
+            var currCell = board[i][j]
+            if (currCell.isMine) {
+                bombCount++
+            }
+        }
+    }
+
+    return bombCount
+}
+
+function updateBombLeft() {
+    const markedLeft = gLevel.MINES - gGame.markedCount
+    document.querySelector('.marked-left').innerText = `Bomb Left: ${markedLeft}`
+}
+
 function revealeAllMines(board) {
     for (var i = 0; i < board.length; i++) {
         for (var j = 0; j < board[i].length; j++) {
@@ -55,5 +72,23 @@ function revealeAllMines(board) {
                 board[i][j].isMarked = false
             }
         }
+    }
+}
+
+function addFlag(elCell, event, i, j) {
+    const cell = gBoard[i][j]
+    if (event.which === 3 && !cell.isShown) {
+        if (!isFirstClick) {
+            firstCellClick(i, j)
+        }
+
+        cell.isMarked = !cell.isMarked
+        elCell.innerText = cell.isMarked ? FLAG : ''
+
+        if (cell.isMarked) gGame.markedCount++
+        else gGame.markedCount--
+
+        updateBombLeft()
+        checkGameOver()
     }
 }

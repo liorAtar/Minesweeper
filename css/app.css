@@ -1,6 +1,11 @@
 body {
   background-color: black;
   color:white;
+  text-align: center;
+}
+
+table {
+  margin: auto;
 }
 
 .cell {
@@ -11,12 +16,23 @@ body {
   background-color:darkslategray;
 }
 
+.cell:hover {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  font-size: 1.5em;
+  background-color:rgb(59, 100, 100);
+}
+
 .shown{
   background-color:rgb(90, 186, 186);
 }
 
-/* .formLine {
-  margin:10px;
-  padding:10px;
-  background-color: cornflowerblue;
-} */
+.shown:hover{
+  background-color:rgb(90, 186, 186);
+}
+
+.lives {
+  height: 30px;
+  vertical-align: middle;
+}
