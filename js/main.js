@@ -5,8 +5,8 @@ var isFirstClick
 var timerInterval
 
 const gLevel = {
-    SIZE: 8,
-    MINES: 14
+    SIZE: 4,
+    MINES: 2
 };
 
 function initGame() {
@@ -18,15 +18,16 @@ function initGame() {
     console.log(gBoard)
 }
 
-function restart(){
+function restart() {
     initGame()
     clearInterval(timerInterval)
-    document.querySelector('.restart').innerHTML = '🙂'
+    document.querySelector('.restart').innerText = '🙂'
     document.querySelector('.timer').innerText = 'Timer: 000'
+    document.querySelector('.msg').innerText = ''
     console.log(gBoard)
 }
 
-function initialVariables(){
+function initialVariables() {
     isFirstClick = false
     gBoard = []
     gGame = {
@@ -38,15 +39,29 @@ function initialVariables(){
     }
 }
 
-function updateTimer(){
-    if(gGame.secsPassed < 1000) {
+function updateLevel(elButtonLevel) {
+    if (elButtonLevel.innerText === 'Easy') {
+        gLevel.SIZE = 4
+        gLevel.MINES = 2
+    } else if (elButtonLevel.innerText === 'Medium') {
+        gLevel.SIZE = 8
+        gLevel.MINES = 14
+    } else if (elButtonLevel.innerText === 'Hard') {
+        gLevel.SIZE = 12
+        gLevel.MINES = 32
+    }
+    restart()
+}
+
+function updateTimer() {
+    if (gGame.secsPassed < 1000) {
         var text = 'Timer: '
         gGame.secsPassed++
-    
-        if(gGame.secsPassed < 10) text += `00${gGame.secsPassed}`
-        else if(gGame.secsPassed < 100 && gGame.secsPassed >= 10) text += `0${gGame.secsPassed}`
-        else if(gGame.secsPassed >= 100) text += gGame.secsPassed
-    
+
+        if (gGame.secsPassed < 10) text += `00${gGame.secsPassed}`
+        else if (gGame.secsPassed < 100 && gGame.secsPassed >= 10) text += `0${gGame.secsPassed}`
+        else if (gGame.secsPassed >= 100) text += gGame.secsPassed
+
         document.querySelector('.timer').innerText = text
     }
 }
@@ -79,36 +94,34 @@ function firstCellClick(i, j) {
     timerInterval = setInterval(updateTimer, 1000)
     randomLocateMine(i, j)
     setMinesNegsCount(gBoard)
-    expandShown(gBoard, i, j)
-    renderBoard(gBoard, '.board-container')
-    console.log(gBoard)
 }
 
 function cellClicked(elCell, i, j) {
     const currCell = gBoard[i][j]
     if (!isFirstClick) {
         firstCellClick(i, j)
+        expandShown(gBoard, i, j)
+        renderBoard(gBoard, '.board-container')
+        console.log(gBoard)
     }
     else if (isFirstClick && gGame.isOn && !currCell.isShown && !currCell.isMarked) {
         if (currCell.isMine) {
             gGame.lives--
             updateLives()
             if (gGame.lives === 0) endGame()
-        }
-        else if (!currCell.isMine) checkGameOver()
+        } else gGame.shownCount++
 
         // Update the current cell value
         elCell.innerText = currCell.isMine ? BOMB :
             currCell.minesAroundCount === 0 ? '' : currCell.minesAroundCount
 
+        currCell.isShown = true
         // Check if cell is empty
         if (elCell.innerText === '') {
             expandShown(gBoard, i, j)
-        } else {
-            gGame.shownCount++
-            currCell.isShown = true
         }
 
+        checkGameOver()
         renderBoard(gBoard, '.board-container')
     }
 }
@@ -132,7 +145,7 @@ function expandShown(board, rowIdx, colIdx) {
 }
 
 function checkGameOver() {
-    if (gGame.markedCount === gLevel.MINES &&
+    if ((gGame.markedCount + 3 - gGame.lives) === gLevel.MINES &&
         gGame.shownCount === (gLevel.SIZE ** 2 - gLevel.MINES)) {
         document.querySelector('.msg').innerText = 'Victory'
         document.querySelector('.restart').innerHTML = '😍'
@@ -141,7 +154,7 @@ function checkGameOver() {
     }
 }
 
-function endGame(){
+function endGame() {
     gGame.isOn = false
     document.querySelector('.msg').innerText = 'GAME OVER'
     document.querySelector('.restart').innerHTML = '🤯'
