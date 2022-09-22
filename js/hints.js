@@ -8,7 +8,6 @@ function resetHints() {
         isOn: false,
         hintLeft: 3
     }
-
     updateAllHintsDisable(false)
 }
 
@@ -57,9 +56,9 @@ function resetSafeClick() {
 }
 
 function safeClicked(elSafeBtn) {
-    var sum = (gLevel.SIZE ** 2) - gGame.shownCount
+    var nonClickedLeft = (gLevel.SIZE ** 2) - gGame.shownCount
 
-    if (!gIsFirstClick && gSafeClick > 0 && sum !== gLevel.MINES) {
+    if (!gIsFirstClick && gSafeClick > 0 && nonClickedLeft !== gLevel.MINES) {
         gSafeClick--
         var safeCell = getSafeClick()
         gSafeTimout = setTimeout(hideSafeCell, 3000, safeCell);
