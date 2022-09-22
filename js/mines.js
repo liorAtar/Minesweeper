@@ -55,7 +55,8 @@ function getCellMinesAround(board, rowIdx, colIdx) {
 }
 
 function updateBombLeft() {
-    const markedLeft = gLevel.MINES - gGame.markedCount - 3 + gGame.lives
+    const allLives = gLevel.SIZE === 4? 2 : 3
+    const markedLeft = gLevel.MINES - gGame.markedCount - allLives + gGame.lives
     document.querySelector('.marked-left').innerText = `Flag Left: ${markedLeft}`
 }
 
@@ -74,7 +75,7 @@ function addFlag(elCell, event, i, j) {
     const cell = gBoard[i][j]
 
     if (event.which === 3 && !cell.isShown) {
-        if (!isFirstClick) {
+        if (gIsFirstClick) {
             firstCellClick(i, j)
             console.log(gBoard)
         }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,20 +8,51 @@
     <title>Minesweeper game</title>
     <link rel="stylesheet" href="css/app.css">
 </head>
+
 <body onload="initGame()">
-    <h1 class="restart" onclick="restart()">🙂</h1>
-    <h2 class="marked-left"></h1>
-    <h2 class="lives"></h2>
-    <h2 class="timer">Timer: 000</h2>
-    <div>
-        <button class="level-btn" onclick="updateLevel(this)">Easy</button>
-        <button class="level-btn" onclick="updateLevel(this)">Medium</button>
-        <button class="level-btn" onclick="updateLevel(this)">Hard</button>
+    <div class="header">
+        <div class="game-score">
+            <h2 class="timer">Timer 000</h2>
+            <h3 class="marked-left"></h3>
+        </div>
+        <img class="restart" onclick="restart()" src="./images/start.png"></img>
+        <h2 class="lives"></h2>
     </div>
-    <div class="board-container"></div>
+    <div class="levels">
+        <button class="level-btn" onclick="updateLevel(this)">EASY</button>
+        <button class="level-btn" onclick="updateLevel(this)">MEDIUM</button>
+        <button class="level-btn" onclick="updateLevel(this)">HARD</button>
+    </div>
+    <div class="table-game">
+        <div>
+            <div class="hint">
+                <button class="hint-btn" onclick="hintClicked(this)">💡</button>
+                <button class="hint-btn" onclick="hintClicked(this)">💡</button>
+                <button class="hint-btn" onclick="hintClicked(this)">💡</button>
+            </div>
+            <div class="safe">
+                <button class="bonus-btn safe-btn" onclick="safeClicked(this)">SAFE CLICK</button>
+                <p class="safe-left">Left: 3</p>
+            </div>
+        </div>
+        <div class="board-container"></div>
+        <div>
+            <div class="hint">
+                <button class="hint-btn" onclick="hintClicked(this)">💡</button>
+                <button class="hint-btn" onclick="hintClicked(this)">💡</button>
+                <button class="hint-btn" onclick="hintClicked(this)">💡</button>
+            </div>
+            <div class="safe">
+                <button class="bonus-btn safe-btn" onclick="safeClicked(this)">SAFE CLICK</button>
+                <p class="safe-left">Left: 3</p>
+            </div>
+        </div>
+    </div>
     <h3 class="msg"></h3>
     <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
     <script src="js/mines.js"></script>
+    <script src="js/hints.js"></script>
 </body>
+
 </html>

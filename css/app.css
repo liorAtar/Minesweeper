@@ -1,7 +1,61 @@
 body {
-  background-color: black;
-  color:white;
+  /* background-color: black; */
+  background-image: url('../images/background.webp');
+  color: white;
   text-align: center;
+}
+
+.header {
+  display: flex;
+}
+
+.restart {
+  width: 70px;
+  height: 70px;
+  margin: auto;
+}
+
+.level-btn {
+  color: white;
+  padding: 10px;
+  letter-spacing: 2px;
+  font-size: 14px;
+  background: transparent;
+  border: 3px solid grey;
+  border-radius: 15px;
+  margin: 10px;
+}
+
+.level-btn:hover {
+  color: white;
+  background: transparent;
+  box-shadow: 0 0 50px #ffffff;
+  border-radius: 15px;
+}
+
+.bonus-btn {
+  color: white;
+  padding: 10px;
+  letter-spacing: 2px;
+  font-size: 14px;
+  background-color: rgb(43, 42, 42);
+  border: 3px solid grey;
+  border-radius: 15px;
+  margin: 10px;
+}
+
+.bonus-btn:hover {
+  background-color: rgb(71, 70, 70);
+}
+
+.table-game {
+  display: inline-flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.board-container {
+  width: 600px;
 }
 
 table {
@@ -13,7 +67,8 @@ table {
   height: 40px;
   text-align: center;
   font-size: 1.5em;
-  background-color:darkslategray;
+  background-color: rgb(43, 42, 42);
+  opacity: 0.8;
 }
 
 .cell:hover {
@@ -21,18 +76,57 @@ table {
   height: 40px;
   text-align: center;
   font-size: 1.5em;
-  background-color:rgb(59, 100, 100);
+  background-color: rgb(61, 60, 60);
 }
 
-.shown{
-  background-color:rgb(90, 186, 186);
+.shown {
+  background-color: rgb(99, 96, 96);
 }
 
-.shown:hover{
-  background-color:rgb(90, 186, 186);
+.shown:hover {
+  background-color: rgb(99, 96, 96);
 }
 
 .lives {
   height: 30px;
-  vertical-align: middle;
+  width: 200px;
+  margin: 10px;
+  font-size: 25px;
+  text-transform: uppercase;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.timer {
+  width: 200px;
+  font-size: 25px;
+  margin: 10px;
+  text-transform: uppercase;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: left;
+}
+
+.marked-left {
+  width: 200px;
+  font-size: 20px;
+  margin: 10px;
+  text-transform: uppercase;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: left;
+}
+
+.hint-btn {
+  background-color: transparent;
+  font-size: xx-large;
+}
+
+.msg {
+  position: fixed;
+  width: 99%;
+  top: 15%;
+  font-size: xxx-large;
+  text-shadow: black 0 -2px;
+}
+
+.game-score{
+  width: 200px;
 }

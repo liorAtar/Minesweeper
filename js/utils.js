@@ -2,7 +2,7 @@
 
 function renderBoard(mat, selector) {
 
-    var strHTML = '<table border="0"><tbody>'
+    var strHTML = '<table border="0" cellspacing="5"><tbody>'
     for (var i = 0; i < mat.length; i++) {
 
         strHTML += '<tr>'
@@ -23,6 +23,13 @@ function renderBoard(mat, selector) {
 
     const elContainer = document.querySelector(selector)
     elContainer.innerHTML = strHTML
+}
+
+// location is an object like this - { i: 2, j: 7 }
+function renderCell(location, value) {
+    // Select the elCell and set the value
+    const elCell = document.querySelector(`.cell-${location.i}-${location.j}`)
+    elCell.innerHTML = value
 }
 
 function getRandomIntInclusive(min, max) {

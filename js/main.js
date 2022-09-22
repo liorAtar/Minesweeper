@@ -1,8 +1,8 @@
 
 var gBoard
 var gGame
-var isFirstClick
-var timerInterval
+var gIsFirstClick
+var gTimerInterval
 
 const gLevel = {
     SIZE: 4,
@@ -10,9 +10,12 @@ const gLevel = {
 };
 
 function initGame() {
+    document.querySelector('.restart').src = './images/start.png'
     initialVariables()
     updateBombLeft()
     updateLives()
+    resetHints()
+    resetSafeClick()
     buildBoard()
     renderBoard(gBoard, '.board-container')
     console.log(gBoard)
@@ -20,33 +23,33 @@ function initGame() {
 
 function restart() {
     initGame()
-    clearInterval(timerInterval)
-    document.querySelector('.restart').innerText = '🙂'
-    document.querySelector('.timer').innerText = 'Timer: 000'
+    clearInterval(gTimerInterval)
+    clearInterval(gHintInterval)
+    document.querySelector('.timer').innerText = 'Timer 000'
     document.querySelector('.msg').innerText = ''
     console.log(gBoard)
 }
 
 function initialVariables() {
-    isFirstClick = false
+    gIsFirstClick = true
     gBoard = []
     gGame = {
         isOn: false,
         shownCount: 0,
         markedCount: 0,
         secsPassed: 0,
-        lives: 3
+        lives: gLevel.SIZE === 4? 2 : 3
     }
 }
 
 function updateLevel(elButtonLevel) {
-    if (elButtonLevel.innerText === 'Easy') {
+    if (elButtonLevel.innerText === 'EASY') {
         gLevel.SIZE = 4
         gLevel.MINES = 2
-    } else if (elButtonLevel.innerText === 'Medium') {
+    } else if (elButtonLevel.innerText === 'MEDIUM') {
         gLevel.SIZE = 8
         gLevel.MINES = 14
-    } else if (elButtonLevel.innerText === 'Hard') {
+    } else if (elButtonLevel.innerText === 'HARD') {
         gLevel.SIZE = 12
         gLevel.MINES = 32
     }
@@ -55,7 +58,7 @@ function updateLevel(elButtonLevel) {
 
 function updateTimer() {
     if (gGame.secsPassed < 1000) {
-        var text = 'Timer: '
+        var text = 'Timer '
         gGame.secsPassed++
 
         if (gGame.secsPassed < 10) text += `00${gGame.secsPassed}`
@@ -68,10 +71,11 @@ function updateTimer() {
 
 function updateLives() {
     var lives = ''
-    for (var i = 0; i < gGame.lives; i++) {
-        lives += '❤️'
-    }
-    document.querySelector('.lives').innerText = `Lives: ${lives}`
+    if (gGame.lives === 3) lives = '🤍🤍🤍'
+    if (gGame.lives === 2) lives = '🤍🤍🖤'
+    if (gGame.lives === 1) lives = '🤍🖤🖤'
+    if (gGame.lives === 0) lives = '🖤🖤🖤'
+    document.querySelector('.lives').innerText = `Lives ${lives}`
 }
 
 function buildBoard() {
@@ -90,21 +94,24 @@ function buildBoard() {
 
 function firstCellClick(i, j) {
     gGame.isOn = true
-    isFirstClick = true
-    timerInterval = setInterval(updateTimer, 1000)
+    gIsFirstClick = false
+    gTimerInterval = setInterval(updateTimer, 1000)
     randomLocateMine(i, j)
     setMinesNegsCount(gBoard)
 }
 
 function cellClicked(elCell, i, j) {
     const currCell = gBoard[i][j]
-    if (!isFirstClick) {
+    if (gIsFirstClick) {
         firstCellClick(i, j)
         expandShown(gBoard, i, j)
         renderBoard(gBoard, '.board-container')
         console.log(gBoard)
     }
-    else if (isFirstClick && gGame.isOn && !currCell.isShown && !currCell.isMarked) {
+    else if (gGame.isOn && gHints.isOn && gHints.hintLeft > 0) {
+        gHintInterval = setInterval(getHint, 1000, i, j)
+        gHints.hintLeft--
+    } else if (gGame.isOn && !currCell.isShown && !currCell.isMarked) {
         if (currCell.isMine) {
             gGame.lives--
             updateLives()
@@ -147,19 +154,23 @@ function expandShown(board, rowIdx, colIdx) {
 function checkGameOver() {
     if ((gGame.markedCount + 3 - gGame.lives) === gLevel.MINES &&
         gGame.shownCount === (gLevel.SIZE ** 2 - gLevel.MINES)) {
-        document.querySelector('.msg').innerText = 'Victory'
-        document.querySelector('.restart').innerHTML = '😍'
+        document.querySelector('.msg').innerText = 'YOU WON!'
+        document.querySelector('.restart').src = './images/won.png'
+        document.querySelector('.safe-btn').disabled = true
+        updateAllHintsDisable(true)
         gGame.isOn = false
-        clearInterval(timerInterval)
+        clearInterval(gTimerInterval)
     }
 }
 
 function endGame() {
     gGame.isOn = false
     document.querySelector('.msg').innerText = 'GAME OVER'
-    document.querySelector('.restart').innerHTML = '🤯'
+    document.querySelector('.restart').src = './images/lost.png'
+    document.querySelector('.safe-btn').disabled = true
+    updateAllHintsDisable(true)
     revealeAllMines(gBoard)
-    clearInterval(timerInterval)
+    clearInterval(gTimerInterval)
     renderBoard(gBoard, '.board-container')
     return
 }
