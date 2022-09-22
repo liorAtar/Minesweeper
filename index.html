@@ -11,12 +11,15 @@
 
 <body onload="initGame()">
     <div class="header">
-        <div class="game-score">
+        <div class="header-side">
             <h2 class="timer">Timer 000</h2>
             <h3 class="marked-left"></h3>
         </div>
         <img class="restart" onclick="restart()" src="./images/start.png"></img>
-        <h2 class="lives"></h2>
+        <div class="header-side">
+            <h2 class="lives"></h2>
+            <button class="mode-btn" onclick="changeMode(this)">LIGHT MODE</button>
+        </div>
     </div>
     <div class="levels">
         <button class="level-btn" onclick="updateLevel(this)">EASY</button>
@@ -24,27 +27,18 @@
         <button class="level-btn" onclick="updateLevel(this)">HARD</button>
     </div>
     <div class="table-game">
-        <div>
-            <div class="hint">
-                <button class="hint-btn" onclick="hintClicked(this)">💡</button>
-                <button class="hint-btn" onclick="hintClicked(this)">💡</button>
-                <button class="hint-btn" onclick="hintClicked(this)">💡</button>
-            </div>
+        <div class="div-bonus">
             <div class="safe">
                 <button class="bonus-btn safe-btn" onclick="safeClicked(this)">SAFE CLICK</button>
                 <p class="safe-left">Left: 3</p>
             </div>
         </div>
         <div class="board-container"></div>
-        <div>
+        <div class="div-bonus">
             <div class="hint">
                 <button class="hint-btn" onclick="hintClicked(this)">💡</button>
                 <button class="hint-btn" onclick="hintClicked(this)">💡</button>
                 <button class="hint-btn" onclick="hintClicked(this)">💡</button>
-            </div>
-            <div class="safe">
-                <button class="bonus-btn safe-btn" onclick="safeClicked(this)">SAFE CLICK</button>
-                <p class="safe-left">Left: 3</p>
             </div>
         </div>
     </div>

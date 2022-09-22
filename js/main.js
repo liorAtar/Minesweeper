@@ -9,6 +9,8 @@ const gLevel = {
     MINES: 2
 };
 
+const ALL_LIVES = gLevel.SIZE === 4? 1 : 3
+
 function initGame() {
     document.querySelector('.restart').src = './images/start.png'
     initialVariables()
@@ -38,7 +40,7 @@ function initialVariables() {
         shownCount: 0,
         markedCount: 0,
         secsPassed: 0,
-        lives: gLevel.SIZE === 4? 2 : 3
+        lives: gLevel.SIZE === 4? 1 : 3
     }
 }
 
@@ -116,8 +118,9 @@ function cellClicked(elCell, i, j) {
             gGame.lives--
             updateLives()
             if (gGame.lives === 0) endGame()
-        } else gGame.shownCount++
+        }
 
+        gGame.shownCount++
         // Update the current cell value
         elCell.innerText = currCell.isMine ? BOMB :
             currCell.minesAroundCount === 0 ? '' : currCell.minesAroundCount
@@ -152,8 +155,8 @@ function expandShown(board, rowIdx, colIdx) {
 }
 
 function checkGameOver() {
-    if ((gGame.markedCount + 3 - gGame.lives) === gLevel.MINES &&
-        gGame.shownCount === (gLevel.SIZE ** 2 - gLevel.MINES)) {
+    if ((gGame.markedCount + ALL_LIVES - gGame.lives) === gLevel.MINES &&
+        gGame.shownCount === (gLevel.SIZE ** 2 - gGame.markedCount)) {
         document.querySelector('.msg').innerText = 'YOU WON!'
         document.querySelector('.restart').src = './images/won.png'
         document.querySelector('.safe-btn').disabled = true

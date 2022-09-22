@@ -75,10 +75,6 @@ function getSafeClick() {
 
     var currCell = gBoard[i][j]
 
-    console.log('gLevel.SIZE ** 2', gLevel.SIZE ** 2)
-    console.log('gGame.shownCount', gGame.shownCount)
-    console.log('gGame.markedCount ', gGame.markedCount)
-
     while ((currCell.isShown || currCell.isMine)) {
         i = getRandomIntInclusive(0, gLevel.SIZE - 1)
         j = getRandomIntInclusive(0, gLevel.SIZE - 1)

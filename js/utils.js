@@ -11,7 +11,7 @@ function renderBoard(mat, selector) {
             const cell = mat[i][j]
             const cellValue = cell.isMine ? BOMB : cell.minesAroundCount === 0 ?
                 '' : cell.minesAroundCount
-            const className = cell.isShown? 'cell cell-' + i + '-' + j + ' shown': 'cell cell-' + i + '-' + j
+            const className = cell.isShown ? 'cell cell-' + i + '-' + j + ' shown' : 'cell cell-' + i + '-' + j
             strHTML += `<td class="${className}" oncontextmenu="return false;"`
             strHTML += `onmousedown="addFlag(this, event, ${i}, ${j})"`
             strHTML += `onclick="cellClicked(this, ${i}, ${j})">${cell.isMarked ? FLAG : cell.isShown ? cellValue : ''}</td>`
@@ -34,4 +34,26 @@ function renderCell(location, value) {
 
 function getRandomIntInclusive(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+function darkMode(elModeBtn) {
+    var element = document.body;
+    element.classList.add('dark-mode');
+    element.classList.remove('light-mode');
+    elModeBtn.innerText = 'LIGHT MODE'
+}
+
+function lightMode(elModeBtn) {
+    var element = document.body;
+    element.classList.add('light-mode');
+    element.classList.remove('dark-mode');
+    elModeBtn.innerText = 'DARK MODE'
+}
+
+function changeMode(elModeBtn) {
+    if(elModeBtn.innerText === 'LIGHT MODE'){
+        lightMode(elModeBtn)
+    } else {
+        darkMode(elModeBtn)
+    }
 }

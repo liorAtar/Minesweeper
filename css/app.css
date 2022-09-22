@@ -1,8 +1,16 @@
 body {
-  /* background-color: black; */
-  background-image: url('../images/background.webp');
   color: white;
   text-align: center;
+  background-image: url('../images/background.webp');
+  transition: 1s;
+}
+
+.dark-mode {
+  background-image: url('../images/background.webp');
+}
+
+.light-mode {
+  background-image: url('../images/background-light.jpg');
 }
 
 .header {
@@ -33,6 +41,22 @@ body {
   border-radius: 15px;
 }
 
+.mode-btn {
+  color: white;
+  padding: 10px;
+  letter-spacing: 2px;
+  font-size: 7px;
+  background-color: transparent;
+  border: 2px solid white;
+  border-radius: 15px;
+  opacity: 0.5;
+}
+
+.mode-btn:hover {
+  background-color: rgb(145, 145, 145);
+  opacity: 0.5;
+}
+
 .bonus-btn {
   color: white;
   padding: 10px;
@@ -52,6 +76,7 @@ body {
   display: inline-flex;
   width: 100%;
   justify-content: center;
+  overflow: auto;
 }
 
 .board-container {
@@ -88,7 +113,6 @@ table {
 }
 
 .lives {
-  height: 30px;
   width: 200px;
   margin: 10px;
   font-size: 25px;
@@ -114,9 +138,14 @@ table {
   text-align: left;
 }
 
+.div-bonus {
+  width: 25%;
+}
+
 .hint-btn {
   background-color: transparent;
   font-size: xx-large;
+  border: none;
 }
 
 .msg {
@@ -125,8 +154,4 @@ table {
   top: 15%;
   font-size: xxx-large;
   text-shadow: black 0 -2px;
-}
-
-.game-score{
-  width: 200px;
 }
