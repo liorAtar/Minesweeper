@@ -1,4 +1,3 @@
-
 var gBoard
 var gGame
 var gIsFirstClick
@@ -8,8 +7,6 @@ const gLevel = {
     SIZE: 4,
     MINES: 2
 };
-
-const ALL_LIVES = gLevel.SIZE === 4? 1 : 3
 
 function initGame() {
     document.querySelector('.restart').src = './images/start.png'
@@ -155,7 +152,9 @@ function expandShown(board, rowIdx, colIdx) {
 }
 
 function checkGameOver() {
-    if ((gGame.markedCount + ALL_LIVES - gGame.lives) === gLevel.MINES &&
+    var allLives = gLevel.SIZE === 4? 1 : 3
+
+    if ((gGame.markedCount + allLives - gGame.lives) === gLevel.MINES &&
         gGame.shownCount === (gLevel.SIZE ** 2 - gGame.markedCount)) {
         document.querySelector('.msg').innerText = 'YOU WON!'
         document.querySelector('.restart').src = './images/won.png'

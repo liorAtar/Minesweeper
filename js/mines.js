@@ -55,11 +55,8 @@ function getCellMinesAround(board, rowIdx, colIdx) {
 }
 
 function updateBombLeft() {
-    console.log('gLevel.MINES', gLevel.MINES)
-    console.log('gGame.markedCount', gGame.markedCount)
-    console.log('ALL_LIVES', ALL_LIVES)
-    console.log('gGame.lives', gGame.lives)
-    const markedLeft = gLevel.MINES - gGame.markedCount - ALL_LIVES + gGame.lives
+    var allLives =  gLevel.SIZE === 4? 1 : 3
+    const markedLeft = gLevel.MINES - gGame.markedCount - allLives + gGame.lives
     document.querySelector('.marked-left').innerText = `Flag Left: ${markedLeft}`
 }
 
