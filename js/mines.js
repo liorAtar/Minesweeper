@@ -55,7 +55,7 @@ function getCellMinesAround(board, rowIdx, colIdx) {
 }
 
 function updateBombLeft() {
-    var allLives =  gLevel.SIZE === 4? 1 : 3
+    var allLives = gLevel.SIZE === 4 ? 1 : 3
     const markedLeft = gLevel.MINES - gGame.markedCount - allLives + gGame.lives
     document.querySelector('.marked-left').innerText = `Flag Left: ${markedLeft}`
 }
@@ -79,15 +79,90 @@ function addFlag(elCell, event, i, j) {
             firstCellClick(i, j)
             console.log(gBoard)
         }
-        
+
         cell.isMarked = !cell.isMarked
         elCell.innerText = cell.isMarked ? FLAG : ''
-        
+
         if (cell.isMarked) gGame.markedCount++
         else gGame.markedCount--
-        
+
         renderBoard(gBoard, '.board-container')
         updateBombLeft()
         checkGameOver()
     }
+}
+
+function exterminatorClicked() {
+    if (!gIsFirstClick) {
+        var allLives = gLevel.SIZE === 4 ? 1 : 3
+        gLevel.MINES -= allLives
+        updateBombLeft()
+        for (var i = 0; i < allLives; i++) {
+            mineExterminator();
+        }
+        renderBoard(gBoard, '.board-container')
+    }
+}
+
+function mineExterminator() {
+    var i = getRandomIntInclusive(0, gLevel.SIZE - 1)
+    var j = getRandomIntInclusive(0, gLevel.SIZE - 1)
+
+    var currCell = gBoard[i][j]
+
+    while ((!currCell.isMine || !currCell.isMine && currCell.isShown)) {
+        i = getRandomIntInclusive(0, gLevel.SIZE - 1)
+        j = getRandomIntInclusive(0, gLevel.SIZE - 1)
+        currCell = gBoard[i][j]
+    }
+
+    var elCurrVell = document.querySelector(`.cell-${i}-${j}`)
+    var cellValue = currCell.isMine ? BOMB : currCell.minesAroundCount === 0 ?
+        '' : currCell.minesAroundCount
+    elCurrVell.classList.add('shown')
+
+
+    renderCell({ i, j }, cellValue)
+    elCurrVell.disabled = true
+    currCell.isMine = false
+    setMinesNegsCount(gBoard)
+}
+
+function sevenBoom() {
+    var bombCount = 0
+    var currNum = 1
+
+    restart()
+    gIsSevenBoom = true
+    for (var i = 0; i < gLevel.SIZE; i++) {
+        for (var j = 0; j < gLevel.SIZE; j++) {
+            // if (i % 7 === 0 || j % 7 === 0 || (i + '').indexOf('7') > -1) {
+            //     console.log('i', i)
+            //     console.log('j', j)
+            //     gBoard[i][j].isMine = true
+            //     bombCount++
+            // } else {
+            //     gBoard[i][j].isMine = false
+            // }
+
+            if (currNum % 7 === 0 || (currNum + '').indexOf('7') > -1) {
+                gBoard[i][j].isMine = true
+                bombCount++
+            } else {
+                gBoard[i][j].isMine = false
+            }
+
+            currNum++
+        }
+    }
+
+    gLevel.MINES = bombCount
+    updateBombLeft()
+}
+
+function manuallyPositioned() {
+    restart()
+    document.querySelector('.manual-left').innerText = `Left ${gLevel.MINES}`
+    document.querySelector('.manual-left').style.visibility = 'visible'
+    gIsManual = true
 }

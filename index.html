@@ -12,8 +12,8 @@
 <body onload="initGame()">
     <div class="header">
         <div class="header-side">
-            <h2 class="timer">Timer 000</h2>
-            <h3 class="marked-left"></h3>
+            <h2 class="values timer">Timer 000</h2>
+            <h3 class="values marked-left"></h3>
         </div>
         <img class="restart" onclick="restart()" src="./images/start.png"></img>
         <div class="header-side">
@@ -32,6 +32,13 @@
                 <button class="bonus-btn safe-btn" onclick="safeClicked(this)">SAFE CLICK</button>
                 <p class="safe-left">Left: 3</p>
             </div>
+            <button class="bonus-btn mega-btn" onclick="megaHintClicked(this)">MEGA HINT</button>
+            <button class="bonus-btn mine-exterminator" onclick="exterminatorClicked(this)">EXTERMINATOR</button>
+            <button class="bonus-btn seven-boom" onclick="sevenBoom()">7 BOOM</button>
+            <div class="manual">
+                <button class="bonus-btn manual-btn" onclick="manuallyPositioned()">MANUALLY POSITIONED</button>
+                <p class="manual-left">Left:</p>
+            </div>
         </div>
         <div class="board-container"></div>
         <div class="div-bonus">
@@ -43,9 +50,11 @@
         </div>
     </div>
     <h3 class="msg"></h3>
+    <h2 class="values best-score">Best Score</h2>
     <script src="js/utils.js"></script>
     <script src="js/main.js"></script>
     <script src="js/mines.js"></script>
+    <script src="js/moves.js"></script>
     <script src="js/hints.js"></script>
 </body>
 

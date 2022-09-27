@@ -1,7 +1,10 @@
 var gBoard
 var gGame
-var gIsFirstClick
 var gTimerInterval
+var gIsSevenBoom
+var gIsManual
+var gManualMineCount
+var gBestScore
 
 const gLevel = {
     SIZE: 4,
@@ -9,23 +12,39 @@ const gLevel = {
 };
 
 function initGame() {
+    restartValues()
+    gBestScore = {
+        EASY: 999,
+        MEDIUM: 999,
+        HARD: 999
+    }
+
+    var level = gLevel.SIZE === 4? 'EASY' : gLevel.SIZE === 8? 'MEDIUM' : 'HARD'
+    window.localStorage.setItem("best-score",  JSON.stringify(gBestScore));
+    var currLocalStorage = JSON.parse(localStorage.getItem('best-score'))
+    document.querySelector('.best-score').innerText = `Best Score ${currLocalStorage[level]}`
+}
+
+function restart() {
+    restartValues()
+    clearInterval(gTimerInterval)
+    clearInterval(gHintInterval)
+    document.querySelector('.timer').innerText = 'Timer 000'
+    document.querySelector('.msg').innerText = ''
+    console.log(gBoard)
+}
+
+function restartValues(){
     document.querySelector('.restart').src = './images/start.png'
     initialVariables()
+    document.querySelector('.manual-left').innerText = `Left ${gLevel.MINES - gManualMineCount}`
+    document.querySelector('.manual-left').style.visibility = 'hidden'
     updateBombLeft()
     updateLives()
     resetHints()
     resetSafeClick()
     buildBoard()
     renderBoard(gBoard, '.board-container')
-    console.log(gBoard)
-}
-
-function restart() {
-    initGame()
-    clearInterval(gTimerInterval)
-    clearInterval(gHintInterval)
-    document.querySelector('.timer').innerText = 'Timer 000'
-    document.querySelector('.msg').innerText = ''
     console.log(gBoard)
 }
 
@@ -37,8 +56,11 @@ function initialVariables() {
         shownCount: 0,
         markedCount: 0,
         secsPassed: 0,
-        lives: gLevel.SIZE === 4? 1 : 3
+        lives: gLevel.SIZE === 4 ? 1 : 3
     }
+    gIsSevenBoom = false
+    gIsManual = false
+    gManualMineCount = 0
 }
 
 function updateLevel(elButtonLevel) {
@@ -52,6 +74,10 @@ function updateLevel(elButtonLevel) {
         gLevel.SIZE = 12
         gLevel.MINES = 32
     }
+    
+    var level = gLevel.SIZE === 4? 'EASY' : gLevel.SIZE === 8? 'MEDIUM' : 'HARD'
+    document.querySelector('.best-score').innerText = `Best Score ${gBestScore[level]}`
+
     restart()
 }
 
@@ -91,76 +117,18 @@ function buildBoard() {
     }
 }
 
-function firstCellClick(i, j) {
-    gGame.isOn = true
-    gIsFirstClick = false
-    gTimerInterval = setInterval(updateTimer, 1000)
-    randomLocateMine(i, j)
-    setMinesNegsCount(gBoard)
-}
-
-function cellClicked(elCell, i, j) {
-    const currCell = gBoard[i][j]
-    if (gIsFirstClick) {
-        firstCellClick(i, j)
-        expandShown(gBoard, i, j)
-        renderBoard(gBoard, '.board-container')
-        console.log(gBoard)
-    }
-    else if (gGame.isOn && gHints.isOn && gHints.hintLeft > 0) {
-        gHintInterval = setInterval(getHint, 1000, i, j)
-        gHints.hintLeft--
-    } else if (gGame.isOn && !currCell.isShown && !currCell.isMarked) {
-        if (currCell.isMine) {
-            gGame.lives--
-            updateLives()
-            if (gGame.lives === 0) endGame()
-        }
-
-        gGame.shownCount++
-        // Update the current cell value
-        elCell.innerText = currCell.isMine ? BOMB :
-            currCell.minesAroundCount === 0 ? '' : currCell.minesAroundCount
-
-        currCell.isShown = true
-        // Check if cell is empty
-        if (elCell.innerText === '') {
-            expandShown(gBoard, i, j)
-        }
-
-        checkGameOver()
-        renderBoard(gBoard, '.board-container')
-    }
-}
-
-function expandShown(board, rowIdx, colIdx) {
-    for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
-        if (i < 0 || i >= board.length) continue
-        for (var j = colIdx - 1; j <= colIdx + 1; j++) {
-            if (j < 0 || j >= board[0].length) continue
-            var currCell = board[i][j]
-            if (currCell.isMarked) continue
-            if (!currCell.isShown && !currCell.isMine && !currCell.isMarked) {
-                currCell.isShown = true
-                gGame.shownCount++
-                if (currCell.minesAroundCount === 0) {
-                    expandShown(board, i, j)
-                }
-            }
-        }
-    }
-}
-
 function checkGameOver() {
-    var allLives = gLevel.SIZE === 4? 1 : 3
+    var allLives = gLevel.SIZE === 4 ? 1 : 3
 
     if ((gGame.markedCount + allLives - gGame.lives) === gLevel.MINES &&
         gGame.shownCount === (gLevel.SIZE ** 2 - gGame.markedCount)) {
         document.querySelector('.msg').innerText = 'YOU WON!'
         document.querySelector('.restart').src = './images/won.png'
         document.querySelector('.safe-btn').disabled = true
+        document.querySelector('.mega-btn').disabled = true
         updateAllHintsDisable(true)
         gGame.isOn = false
+        bestScore()
         clearInterval(gTimerInterval)
     }
 }
@@ -170,9 +138,26 @@ function endGame() {
     document.querySelector('.msg').innerText = 'GAME OVER'
     document.querySelector('.restart').src = './images/lost.png'
     document.querySelector('.safe-btn').disabled = true
+    document.querySelector('.mega-btn').disabled = true
     updateAllHintsDisable(true)
     revealeAllMines(gBoard)
     clearInterval(gTimerInterval)
     renderBoard(gBoard, '.board-container')
     return
+}
+
+function bestScore() {
+    if (typeof (Storage) !== "undefined") {
+        // Code for localStorage/sessionStorage.
+        var currLocalStorage = JSON.parse(localStorage.getItem('best-score'))
+        var level = gLevel.SIZE === 4? 'EASY' : gLevel.SIZE === 8? 'MEDIUM' : 'HARD'
+        gBestScore[level] = gGame.secsPassed
+
+        if(gGame.secsPassed < currLocalStorage[level]){
+            window.localStorage.setItem("best-score", JSON.stringify(gBestScore))
+            document.querySelector('.best-score').innerText = `Best Score ${gBestScore[level]}`
+        }
+    } else {
+        // Sorry! No Web Storage support..
+    }
 }

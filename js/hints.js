@@ -2,12 +2,22 @@ var gHints
 var gHintInterval
 var gSafeClick
 var gSafeTimout
+var gMegaHint
+var gMegaHintTimout
 
 function resetHints() {
     gHints = {
         isOn: false,
         hintLeft: 3
     }
+    gMegaHint = {
+        isOn: false,
+        cellClickedCount: 0,
+        cell1: {},
+        cell2: {}
+    }
+    var elMega = document.querySelector('.mega-btn')
+    elMega.disabled = false
     updateAllHintsDisable(false)
 }
 
@@ -31,15 +41,15 @@ function getHint(rowIdx, colIdx) {
         for (var j = colIdx - 1; j <= colIdx + 1; j++) {
             if (j < 0 || j >= gBoard[0].length) continue
             var currCell = gBoard[i][j]
-            var elCurrVell = document.querySelector(`.cell-${i}-${j}`)
+            var elCurrCell = document.querySelector(`.cell-${i}-${j}`)
             var cellValue = currCell.isMine ? BOMB : currCell.minesAroundCount === 0 ?
                 '' : currCell.minesAroundCount
 
             if (!currCell.isShown && gHints.isOn) {
-                elCurrVell.classList.add('shown')
+                elCurrCell.classList.add('shown')
                 renderCell({ i, j }, cellValue)
             } else if (!currCell.isShown && !gHints.isOn) {
-                elCurrVell.classList.remove('shown')
+                elCurrCell.classList.remove('shown')
                 renderCell({ i, j }, currCell.isMarked ? FLAG : '')
             }
         }
@@ -96,7 +106,45 @@ function hideSafeCell(cell) {
     var elCurrVell = document.querySelector(`.cell-${cell.i}-${cell.j}`)
     elCurrVell.classList.remove('shown')
     var cellValue = currCell.isMarked ? FLAG : ''
-    
+
     renderCell({ i: cell.i, j: cell.j }, cellValue)
     elCurrVell.disabled = false
+}
+
+function megaHintClicked(el) {
+    if (!gIsFirstClick) {
+        gMegaHint.isOn = true
+        gMegaHint.isUsed = true
+        el.disabled = true
+    }
+}
+
+function getMegaHint(gBoard) {
+    var startPos = gMegaHint.cell1.j < gMegaHint.cell2.j ?
+        gMegaHint.cell1 : { i: gMegaHint.cell1.i, j: gMegaHint.cell2.j }
+    var endPos = gMegaHint.cell1.j < gMegaHint.cell2.j ?
+        gMegaHint.cell2 : { i: gMegaHint.cell2.i, j: gMegaHint.cell1.j }
+
+    showOrHideMega(gBoard, startPos, endPos)
+    gMegaHint.isOn = false
+    gSafeTimout = setTimeout(showOrHideMega, 2000, gBoard, startPos, endPos);
+}
+
+function showOrHideMega(board, startPos, endPos) {
+    for (var i = startPos.i; i <= endPos.i; i++) {
+        for (var j = startPos.j; j <= endPos.j; j++) {
+            var currCell = board[i][j]
+            var elCurrCell = document.querySelector(`.cell-${i}-${j}`)
+            var cellValue = currCell.isMine ? BOMB : currCell.minesAroundCount === 0 ?
+                '' : currCell.minesAroundCount
+
+            if (gMegaHint.isOn && !currCell.isShown) {
+                elCurrCell.classList.add('shown')
+                renderCell({ i, j }, cellValue)
+            } else if (!gMegaHint.isOn && !currCell.isShown) {
+                elCurrCell.classList.remove('shown')
+                renderCell({ i, j }, currCell.isMarked ? FLAG : '')
+            }
+        }
+    }
 }
